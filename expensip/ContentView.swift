@@ -13,8 +13,45 @@ struct ContentView: View {
     
     var body: some View {
         VStack {
-            TextField("ss", value: $score, formatter: AAA())
-                .keyboardType(.decimalPad)
+            DecimalView()
+//            TextField("ss", value: $score, formatter: AAA())
+//                .padding()
+//                .background(Color.black.opacity(0.1))
+//                .padding()
+//                .keyboardType(.decimalPad)
+        }
+    }
+}
+
+struct DecimalView: View {
+    @State private var amount = ""
+    var body: some View {
+        Form {
+            Section(header: Text("Amount")) {
+                HStack {
+                    Text("£")
+                    TextField("Enter amount", text: $amount)
+                        .keyboardType(.decimalPad)
+                        .onChange(of: amount) { _ in
+                            let filtered = amount.filter {"0123456789.".contains($0)}
+                            
+                            if filtered == "." {
+                                amount = "0."
+                            } else if filtered == "00" {
+                                amount = "0"
+                            }
+                            
+                            else if filtered.contains(".") {
+                                let splitted = filtered.split(separator: ".", omittingEmptySubsequences: false)
+                                if splitted.count >= 2 {
+                                    let preDecimal = String(splitted[0])
+                                    let afterDecimal = String(splitted[1])
+                                    amount = "\(preDecimal).\(afterDecimal.prefix(2))"
+                                }
+                            }
+                        }
+                }
+            }
         }
     }
 }
@@ -40,6 +77,7 @@ class AAA: Formatter {
     
     func formatted(value: String?) -> String? {
         guard let aa = value else { return nil }
+        
         return aa
     }
 }
